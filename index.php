@@ -22,7 +22,7 @@ if ($chat_id && $text == '/start') {
 // لیست قیمت‌ها (نمایش انتخاب مدت)
 if ($chat_id && $text == "💰 لیست قیمتها") {
     require_once __DIR__ . '/menu_prices.php';
-    showPriceDurations($chat_id);
+    showPriceDurations($token, $chat_id);
     exit;
 }
 
@@ -30,7 +30,7 @@ if ($chat_id && $text == "💰 لیست قیمتها") {
 if ($callback_data && strpos($callback_data, 'price_') === 0) {
     require_once __DIR__ . '/menu_prices.php';
     $duration = str_replace('price_', '', $callback_data);
-    sendPriceList($callback_chat, $message_id, $duration);
+    sendPriceList($token, $callback_chat, $message_id, $duration);
     exit;
 }
 
@@ -79,3 +79,4 @@ function editMessageText($chat_id, $message_id, $text) {
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }
 ?>
+
