@@ -69,8 +69,7 @@ function sendMessage($token, $chat_id, $text, $keyboard = null) {
     file_get_contents("https://api.telegram.org/bot{$token}/sendMessage?" . http_build_query($data));
 }
 
-function editMessageText($chat_id, $message_id, $text) {
-    global $token;
+function editMessageText($token, $chat_id, $message_id, $text) {
     $data = [
         'chat_id'    => $chat_id,
         'message_id' => $message_id,
@@ -78,5 +77,7 @@ function editMessageText($chat_id, $message_id, $text) {
     ];
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }
+
 ?>
+
 
