@@ -34,15 +34,7 @@ if ($callback_data && strpos($callback_data, 'price_') === 0) {
     exit;
 }
 
-// 🔹 اینجا می‌تونی بقیه گزینه‌های منو رو اضافه کنی
-/*
-if ($chat_id && $text == "📞 تماس با ما") {
-    sendMessage($token, $chat_id, "شماره تماس: ۰۱۲۳۴۵۶۷۸۹");
-    exit;
-}
-*/
-
-// پیام پیش‌فرض (فقط اگر به هیچ گزینه‌ای نخورده باشد)
+// پیام پیش‌فرض
 if ($chat_id && $text != '' && 
     $text != '/start' && 
     $text != '💰 لیست قیمتها') {
@@ -50,7 +42,7 @@ if ($chat_id && $text != '' &&
     exit;
 }
 
-// === بخش تنظیم وبهوک از مرورگر ===
+// تنظیم وبهوک از مرورگر
 if (isset($_GET['setwebhook'])) {
     $url = "https://adsl2bot-php.onrender.com/index.php";
     file_get_contents("https://api.telegram.org/bot{$token}/setWebhook?" . http_build_query(['url' => $url]));
@@ -77,7 +69,4 @@ function editMessageText($token, $chat_id, $message_id, $text) {
     ];
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }
-
 ?>
-
-
