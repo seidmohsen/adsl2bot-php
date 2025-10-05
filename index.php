@@ -178,12 +178,26 @@ if ($chat_id && $text === "🎉 جشنواره ثبت نام") {
     exit;
 }
 
-// تغییر مدت
-if ($callback_data === "change_duration") {
-    require_once __DIR__ . '/menu_prices.php';
-    editPriceDurations($token, $callback_chat, $callback_mid);
+
+// *** منطق جدید برای دکمه '🔄 تغییر مدت' ***
+if ($callback_data && $callback_data === 'change_duration') {
+    $keyboard = [
+        'inline_keyboard' => [
+            [
+                ['text' => '۱ ماهه', 'callback_data' => 'price_1ماهه'],
+                ['text' => '۳ ماهه', 'callback_data' => 'price_3ماه']
+            ],
+            [
+                ['text' => '۶ ماهه', 'callback_data' => 'price_6ماه'],
+                ['text' => '۱۲ ماهه', 'callback_data' => 'price_12ماه']
+            ]
+        ]
+    ];
+    // به جای ارسال پیام جدید، پیام قبلی (لیست قیمت) را ویرایش می‌کنیم و کیبورد انتخاب مدت را جایگزین می‌کنیم.
+    editMessageTextWithKeyboard($token, $callback_chat, $message_id, "📅 مدت زمان سرویس را انتخاب کنید:", $keyboard);
     exit;
 }
+// -----------------------------------------------------------------
 
 // انتخاب مدت
 if ($callback_data && strpos($callback_data, 'price_') === 0) {
@@ -216,6 +230,7 @@ if ($chat_id && $text !== '' &&
     exit;
 }
 ?>
+
 
 
 
