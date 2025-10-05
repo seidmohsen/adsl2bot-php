@@ -1,4 +1,7 @@
 <?php
+// توجه: تابع sendMessage در index.php تعریف شده و در اینجا قابل دسترسی است.
+// توجه: تابع editMessageTextWithKeyboard در index.php تعریف شده و در اینجا قابل دسترسی است.
+
 function showPriceDurations($token, $chat_id) {
     $keyboard = [
         'inline_keyboard' => [
@@ -12,6 +15,7 @@ function showPriceDurations($token, $chat_id) {
             ]
         ]
     ];
+    // در شروع، چون از دکمه منوی اصلی (Reply Keyboard) آمده، پیام جدید ارسال می‌شود.
     sendMessage($token, $chat_id, "📅 مدت زمان سرویس را انتخاب کنید:", $keyboard);
 }
 
@@ -27,12 +31,12 @@ function sendPriceList($token, $chat_id, $message_id, $duration) {
                 number_format($srv['price']) . " تومان";
         }
 
-        // ساخت متن پیام
+        // ساخت متن پیام با فرمت HTML/Bold و جداکننده
         $msg = "💰 لیست قیمت سرویس‌های {$duration}:\n\n";
         $first = true;
         foreach ($grouped as $speed => $list) {
             if (!$first) {
-                $msg .= "\n───────────────\n\n";
+                $msg .= "\n───────────────\n\n"; // خط جداکننده
             }
             $msg .= "<b>⚡ سرعت {$speed} مگابیت</b>\n";
             $msg .= implode("\n", $list) . "\n";
@@ -48,22 +52,10 @@ function sendPriceList($token, $chat_id, $message_id, $duration) {
             ]
         ];
 
-        editMessageTextFormatted($token, $chat_id, $message_id, $msg, 'HTML', $keyboard);
+        // پیام قبلی (انتخاب مدت) را با لیست قیمت جدید و دکمه 'تغییر مدت' ویرایش می‌کنیم.
+        editMessageTextWithKeyboard($token, $chat_id, $message_id, $msg, $keyboard, 'HTML');
     } else {
-        editMessageText($token, $chat_id, $message_id, "⛔ داده‌ای یافت نشد.");
+        editMessageTextWithKeyboard($token, $chat_id, $message_id, "⛔ داده‌ای برای {$duration} یافت نشد.", null);
     }
-}
-
-function editMessageTextFormatted($token, $chat_id, $message_id, $text, $parse_mode='HTML', $keyboard = null) {
-    $data = [
-        'chat_id'    => $chat_id,
-        'message_id' => $message_id,
-        'text'       => $text,
-        'parse_mode' => $parse_mode
-    ];
-    if ($keyboard) {
-        $data['reply_markup'] = json_encode($keyboard, JSON_UNESCAPED_UNICODE);
-    }
-    file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }
 ?>
