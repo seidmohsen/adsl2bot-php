@@ -33,6 +33,11 @@ if ($callback_data && strpos($callback_data, 'price_') === 0) {
     sendPriceList($token, $callback_chat, $message_id, $duration);
     exit;
 }
+if ($callback_data && $callback_data === 'change_duration') {
+    require_once __DIR__ . '/menu_prices.php';
+    showPriceDurations($token, $callback_chat);
+    exit;
+}
 
 // پیام پیش‌فرض
 if ($chat_id && $text != '' && 
@@ -70,3 +75,4 @@ function editMessageText($token, $chat_id, $message_id, $text) {
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }
 ?>
+
