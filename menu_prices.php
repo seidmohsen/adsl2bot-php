@@ -1,7 +1,7 @@
 <?php
 // menu_prices.php
 
-function showPriceDurations($chat_id) {
+function showPriceDurations($token, $chat_id) {
     $keyboard = [
         'inline_keyboard' => [
             [
@@ -14,10 +14,10 @@ function showPriceDurations($chat_id) {
             ]
         ]
     ];
-    sendMessage($chat_id, "📅 مدت زمان سرویس را انتخاب کنید:", $keyboard);
+    sendMessage($token, $chat_id, "📅 مدت زمان سرویس را انتخاب کنید:", $keyboard);
 }
 
-function sendPriceList($chat_id, $message_id, $duration) {
+function sendPriceList($token, $chat_id, $message_id, $duration) {
     $prices = include __DIR__ . '/pricess.php';
 
     if (isset($prices[$duration])) {
@@ -35,8 +35,8 @@ function sendPriceList($chat_id, $message_id, $duration) {
             $msg .= "\n⚡ سرعت {$speed} مگابیت:\n" . implode("\n", $list) . "\n";
         }
 
-        editMessageText($chat_id, $message_id, $msg);
+        editMessageText($token, $chat_id, $message_id, $msg);
     } else {
-        editMessageText($chat_id, $message_id, "⛔ داده‌ای یافت نشد.");
+        editMessageText($token, $chat_id, $message_id, "⛔ داده‌ای یافت نشد.");
     }
 }
