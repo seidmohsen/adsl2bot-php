@@ -1,6 +1,6 @@
 <?php
 // تنظیمات
-$token = "6173364673:AAFWVM-ZYVqBjscpkj5ADIIXry4eHxgL9Cs";
+$token = getenv("BOT_TOKEN");
 
 // گرفتن داده POST از تلگرام
 $update = json_decode(file_get_contents("php://input"), true);
@@ -25,3 +25,4 @@ if (isset($_GET['setwebhook'])) {
 
 echo "Bot PHP is Running!";
 ?>
+
