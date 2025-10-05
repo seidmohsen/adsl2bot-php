@@ -117,35 +117,32 @@ function editMessageText($token, $chat_id, $message_id, $text) {
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }*/
 
-
-
-
 // توکن ربات
 $token = getenv("BOT_TOKEN");
 
-// دریافت داده‌های وبهوک
+// دریافت داده‌های وبهوک از تلگرام
 $update = json_decode(file_get_contents('php://input'), true);
 
 $chat_id       = $update['message']['chat']['id'] ?? null;
-$text          = $update['message']['text'] ?? null;
+$text          = trim($update['message']['text'] ?? '');
 $callback_data = $update['callback_query']['data'] ?? null;
 $callback_chat = $update['callback_query']['message']['chat']['id'] ?? null;
 $callback_mid  = $update['callback_query']['message']['message_id'] ?? null;
 
 // ======== توابع کمکی ========
-function sendMessage($token, $chat_id, $text, $keyboard = null, $parse_mode = 'Markdown') {
+function sendMessage($token, $chat_id, $text, $keyboard = null, $parse_mode = 'HTML') {
     $data = [
         'chat_id'    => $chat_id,
         'text'       => $text,
         'parse_mode' => $parse_mode
     ];
     if ($keyboard) {
-        $data['reply_markup'] = json_encode($keyboard);
+        $data['reply_markup'] = json_encode($keyboard, JSON_UNESCAPED_UNICODE);
     }
     file_get_contents("https://api.telegram.org/bot$token/sendMessage?" . http_build_query($data));
 }
 
-function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyboard = null, $parse_mode = 'Markdown') {
+function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyboard = null, $parse_mode = 'HTML') {
     $data = [
         'chat_id'    => $chat_id,
         'message_id' => $message_id,
@@ -153,37 +150,36 @@ function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyb
         'parse_mode' => $parse_mode
     ];
     if ($keyboard) {
-        $data['reply_markup'] = json_encode($keyboard);
+        $data['reply_markup'] = json_encode($keyboard, JSON_UNESCAPED_UNICODE);
     }
     file_get_contents("https://api.telegram.org/bot$token/editMessageText?" . http_build_query($data));
 }
 
 // ======== منطق اصلی ========
 
-// شروع
-if ($chat_id && $text == "/start") {
+// شروع ربات
+if ($chat_id && $text === "/start") {
     require_once __DIR__ . '/menu.php';
-    showMainMenu($token, $chat_id);
+    sendMainMenu($chat_id, $token);
     exit;
 }
 
 // لیست قیمتها
-if ($chat_id && $text == "💰 لیست قیمتها") {
+if ($chat_id && $text === "💰 لیست قیمتها") {
     require_once __DIR__ . '/menu_prices.php';
     showPriceDurations($token, $chat_id);
     exit;
 }
 
-// جشنواره ثبت نام
-if ($chat_id && $text == "🎉 جشنواره ثبت نام") {
+// جشنواره ثبت‌نام
+if ($chat_id && $text === "🎉 جشنواره ثبت نام") {
     require_once __DIR__ . '/menu_festival.php';
     sendFestivalOffers($token, $chat_id);
     exit;
 }
 
-
 // تغییر مدت
-if ($callback_data == "change_duration") {
+if ($callback_data === "change_duration") {
     require_once __DIR__ . '/menu_prices.php';
     editPriceDurations($token, $callback_chat, $callback_mid);
     exit;
@@ -199,26 +195,28 @@ if ($callback_data && strpos($callback_data, 'price_') === 0) {
 
 // کال‌بک ثبت‌نام جشنواره
 if ($callback_data && strpos($callback_data, 'fest_offer_') === 0) {
-    $offer = str_replace('fest_offer_', '', $callback_data);
-    sendMessage($token, $callback_chat, "✅ ثبت‌نام برای سرویس جشنواره **{$offer}** انجام شد.");
+    $offer = htmlspecialchars(str_replace('fest_offer_', '', $callback_data));
+    sendMessage($token, $callback_chat, "✅ ثبت‌نام برای سرویس جشنواره <b>{$offer}</b> انجام شد.");
     exit;
 }
 
 // بازگشت به منوی اصلی
-if ($callback_data == "main_menu") {
+if ($callback_data === "main_menu") {
     require_once __DIR__ . '/menu.php';
     editMainMenu($token, $callback_chat, $callback_mid);
     exit;
 }
 
-// پیام پیش‌فرض
-if ($chat_id && $text != '') {
+// پیام پیش‌فرض (وقتی هیچ مسیری منطبق نیست)
+if ($chat_id && $text !== '' &&
+    $text !== '/start' &&
+    $text !== '💰 لیست قیمتها' &&
+    $text !== '🎉 جشنواره ثبت نام') {
     sendMessage($token, $chat_id, "برای شروع، دستور /start را بزنید.");
     exit;
 }
-
-
 ?>
+
 
 
 
