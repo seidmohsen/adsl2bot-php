@@ -26,6 +26,15 @@ if ($chat_id && $text == "💰 لیست قیمتها") {
     exit;
 }
 
+// *** منطق جدید: جشنواره ثبت نام ***
+if ($chat_id && $text == "🎁 جشنواره ثبت نام") {
+    require_once __DIR__ . '/menu_festival.php'; // فایل جدید را include می‌کنیم
+    sendFestivalOffers($token, $chat_id);
+    exit;
+}
+// ------------------------------------
+
+
 // اگر callback انتخاب مدت سرویس بود (مثلاً price_1ماهه)
 if ($callback_data && strpos($callback_data, 'price_') === 0) {
     require_once __DIR__ . '/menu_prices.php';
@@ -108,3 +117,4 @@ function editMessageText($token, $chat_id, $message_id, $text) {
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }
 ?>
+
