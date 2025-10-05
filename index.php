@@ -1,28 +1,20 @@
 <?php
-// تنظیمات
-$token = getenv("BOT_TOKEN");
-
-// گرفتن داده POST از تلگرام
+$token = getenv("BOT_TOKEN"); // توکن از Environment Variables
 $update = json_decode(file_get_contents("php://input"), true);
 
-if (isset($update['message'])) {
-    $chat_id = $update['message']['chat']['id'];
-    $text = $update['message']['text'] ?? '';
+$chat_id = $update['message']['chat']['id'] ?? null;
+$text    = trim($update['message']['text'] ?? '');
 
-    // پاسخ نمونه
-    $reply = "بات فعال شد ✅\nپیام شما: " . $text;
+require_once "menu.php";
 
-    file_get_contents("https://api.telegram.org/bot{$token}/sendMessage?chat_id={$chat_id}&text=" . urlencode($reply));
+if ($text == "/start") {
+    sendMainMenu($chat_id, $token);
+} else {
+    file_get_contents("https://api.telegram.org/bot{$token}/sendMessage?" . http_build_query([
+        'chat_id' => $chat_id,
+        'text' => "برای شروع، دستور /start را بزنید."
+    ]));
 }
-
-// اگر بخوای Webhook رو ستاپ کنی:
-if (isset($_GET['setwebhook'])) {
-    $url = "https://" . $_SERVER['HTTP_HOST'] . "/index.php";
-    $set = file_get_contents("https://api.telegram.org/bot{$token}/setWebhook?url={$url}");
-    echo $set;
-    exit;
-}
-
-echo "Bot PHP is Running!";
 ?>
+
 
