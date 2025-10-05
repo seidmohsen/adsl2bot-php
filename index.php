@@ -175,11 +175,12 @@ if ($chat_id && $text == "💰 لیست قیمتها") {
 }
 
 // جشنواره ثبت نام
-if ($chat_id && $text == "🎁 جشنواره ثبت نام") {
+if ($chat_id && $text == "🎉 جشنواره ثبت نام") {
     require_once __DIR__ . '/menu_festival.php';
     sendFestivalOffers($token, $chat_id);
     exit;
 }
+
 
 // تغییر مدت
 if ($callback_data == "change_duration") {
@@ -218,5 +219,6 @@ if ($chat_id && $text != '') {
 
 
 ?>
+
 
 
