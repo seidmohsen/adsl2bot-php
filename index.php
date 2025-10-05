@@ -1,4 +1,4 @@
-<?php
+<?php /*
 $token = getenv("BOT_TOKEN");
 
 // دریافت آپدیت از تلگرام
@@ -115,6 +115,108 @@ function editMessageText($token, $chat_id, $message_id, $text) {
         'text'       => $text
     ];
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
+}*/
+
+
+
+
+// توکن ربات
+$token = getenv("BOT_TOKEN");
+
+// دریافت داده‌های وبهوک
+$update = json_decode(file_get_contents('php://input'), true);
+
+$chat_id       = $update['message']['chat']['id'] ?? null;
+$text          = $update['message']['text'] ?? null;
+$callback_data = $update['callback_query']['data'] ?? null;
+$callback_chat = $update['callback_query']['message']['chat']['id'] ?? null;
+$callback_mid  = $update['callback_query']['message']['message_id'] ?? null;
+
+// ======== توابع کمکی ========
+function sendMessage($token, $chat_id, $text, $keyboard = null, $parse_mode = 'Markdown') {
+    $data = [
+        'chat_id'    => $chat_id,
+        'text'       => $text,
+        'parse_mode' => $parse_mode
+    ];
+    if ($keyboard) {
+        $data['reply_markup'] = json_encode($keyboard);
+    }
+    file_get_contents("https://api.telegram.org/bot$token/sendMessage?" . http_build_query($data));
 }
+
+function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyboard = null, $parse_mode = 'Markdown') {
+    $data = [
+        'chat_id'    => $chat_id,
+        'message_id' => $message_id,
+        'text'       => $text,
+        'parse_mode' => $parse_mode
+    ];
+    if ($keyboard) {
+        $data['reply_markup'] = json_encode($keyboard);
+    }
+    file_get_contents("https://api.telegram.org/bot$token/editMessageText?" . http_build_query($data));
+}
+
+// ======== منطق اصلی ========
+
+// شروع
+if ($chat_id && $text == "/start") {
+    require_once __DIR__ . '/menu.php';
+    showMainMenu($token, $chat_id);
+    exit;
+}
+
+// لیست قیمتها
+if ($chat_id && $text == "💰 لیست قیمتها") {
+    require_once __DIR__ . '/menu_prices.php';
+    showPriceDurations($token, $chat_id);
+    exit;
+}
+
+// جشنواره ثبت نام
+if ($chat_id && $text == "🎁 جشنواره ثبت نام") {
+    require_once __DIR__ . '/menu_festival.php';
+    sendFestivalOffers($token, $chat_id);
+    exit;
+}
+
+// تغییر مدت
+if ($callback_data == "change_duration") {
+    require_once __DIR__ . '/menu_prices.php';
+    editPriceDurations($token, $callback_chat, $callback_mid);
+    exit;
+}
+
+// انتخاب مدت
+if ($callback_data && strpos($callback_data, 'price_') === 0) {
+    require_once __DIR__ . '/menu_prices.php';
+    $duration = str_replace('price_', '', $callback_data);
+    sendPriceList($token, $callback_chat, $callback_mid, $duration);
+    exit;
+}
+
+// کال‌بک ثبت‌نام جشنواره
+if ($callback_data && strpos($callback_data, 'fest_offer_') === 0) {
+    $offer = str_replace('fest_offer_', '', $callback_data);
+    sendMessage($token, $callback_chat, "✅ ثبت‌نام برای سرویس جشنواره **{$offer}** انجام شد.");
+    exit;
+}
+
+// بازگشت به منوی اصلی
+if ($callback_data == "main_menu") {
+    require_once __DIR__ . '/menu.php';
+    editMainMenu($token, $callback_chat, $callback_mid);
+    exit;
+}
+
+// پیام پیش‌فرض
+if ($chat_id && $text != '') {
+    sendMessage($token, $chat_id, "برای شروع، دستور /start را بزنید.");
+    exit;
+}
+
+
 ?>
+
 
