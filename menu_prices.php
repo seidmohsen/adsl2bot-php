@@ -1,6 +1,4 @@
 <?php
-// menu_prices.php
-
 function showPriceDurations($token, $chat_id) {
     $keyboard = [
         'inline_keyboard' => [
@@ -21,7 +19,6 @@ function sendPriceList($token, $chat_id, $message_id, $duration) {
     $prices = include __DIR__ . '/pricess.php';
 
     if (isset($prices[$duration])) {
-        // گروه‌بندی بر اساس سرعت
         $grouped = [];
         foreach ($prices[$duration] as $srv) {
             $grouped[$srv['speed']][] =
@@ -29,7 +26,6 @@ function sendPriceList($token, $chat_id, $message_id, $duration) {
                 number_format($srv['price']) . " تومان";
         }
 
-        // متن کامل
         $msg = "💰 لیست قیمت {$duration}:\n";
         foreach ($grouped as $speed => $list) {
             $msg .= "\n⚡ سرعت {$speed} مگابیت:\n" . implode("\n", $list) . "\n";
@@ -40,3 +36,4 @@ function sendPriceList($token, $chat_id, $message_id, $duration) {
         editMessageText($token, $chat_id, $message_id, "⛔ داده‌ای یافت نشد.");
     }
 }
+?>
