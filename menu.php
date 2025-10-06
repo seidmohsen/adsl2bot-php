@@ -29,26 +29,31 @@
 }*/
 
 
+
 function sendMainMenu($chat_id, $token){
-    // کیبورد اینلاین با متن فارسی
+    // منوی اصلی با دکمه‌های فارسی و ایموجی، و callback_data ثابت
     $keyboard = [
         'inline_keyboard' => [
-            [['text' => '📝 ثبت نام', 'callback_data' => '/register']],
+            [['text' => '📝 ثبت نام', 'callback_data' => '/register']], // هنوز پیاده‌سازی نشده
             [['text' => '🎉 جشنواره ثبت نام', 'callback_data' => '/festival']],
             [['text' => '💰 لیست قیمتها', 'callback_data' => '/prices']],
-            [['text' => '🔄 تمدید سرویس', 'callback_data' => '/renew']],
-            [['text' => '📞 تماس با ما', 'callback_data' => '/contact']]
+            [['text' => '🔄 تمدید سرویس', 'callback_data' => '/renew']], // هنوز پیاده‌سازی نشده
+            [['text' => '📞 تماس با ما', 'callback_data' => '/contact']] // هنوز پیاده‌سازی نشده
         ]
     ];
 
+    // متن خوش‌آمدگویی
     $text = "🌐 خوش آمدید!\n\n"
           . "لطفاً یکی از گزینه‌ها را انتخاب کنید:";
 
+    // ارسال پیام به تلگرام
     file_get_contents("https://api.telegram.org/bot{$token}/sendMessage?" . http_build_query([
         'chat_id' => $chat_id,
         'text' => $text,
         'reply_markup' => json_encode($keyboard, JSON_UNESCAPED_UNICODE)
     ]));
 }
+
+
 
 ?>
