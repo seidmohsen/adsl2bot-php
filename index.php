@@ -110,7 +110,7 @@ function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyb
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }*/
 
-<?php
+
 use PDO;
 
 // --- اتصال به PostgreSQL ---
@@ -298,3 +298,4 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
