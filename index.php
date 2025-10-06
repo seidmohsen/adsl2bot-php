@@ -111,12 +111,16 @@ function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyb
 }*/
 
 
-<?php 
-require_once __DIR__ . '/vendor/autoload.php';
 
+
+
+
+
+
+require_once __DIR__ . '/vendor/autoload.php';
 use PDO;
 
-// اتصال به PostgreSQL
+// --- اتصال به PostgreSQL ---
 function getDb() {
     static $pdo;
     if (!$pdo) {
@@ -129,6 +133,7 @@ function getDb() {
             getenv('PGPASSWORD')
         );
         $pdo = new PDO($dsn);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     return $pdo;
 }
@@ -166,7 +171,7 @@ function clearUserState($chat_id) {
     $stmt->execute([':chat_id' => $chat_id]);
 }
 
-// توابع ارسال پیام
+// --- توابع ارسال پیام ---
 function sendMessage($token, $chat_id, $text, $keyboard = null, $parse_mode = null) {
     $data = ['chat_id' => $chat_id, 'text' => $text];
     if ($keyboard) $data['reply_markup'] = json_encode($keyboard, JSON_UNESCAPED_UNICODE);
@@ -181,6 +186,7 @@ function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyb
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }
 
+// --- اطلاعات آپدیت ---
 $token = getenv("BOT_TOKEN");
 $update = json_decode(file_get_contents("php://input"), true);
 
@@ -190,8 +196,58 @@ $callback_data = $update['callback_query']['data'] ?? null;
 $callback_chat = $update['callback_query']['message']['chat']['id'] ?? null;
 $message_id    = $update['callback_query']['message']['message_id'] ?? null;
 
-// ۱) انتخاب یکی از جشنواره‌ها
+// --- مسیرها ثابت (منو اصلی) ---
+if ($chat_id && $text === '/start') {
+    require_once __DIR__ . '/menu.php';
+    sendMainMenu($chat_id, $token);
+    exit;
+}
+
+if ($chat_id && $text === '💰 لیست قیمتها') {
+    require_once __DIR__ . '/menu_prices.php';
+    showPriceDurations($token, $chat_id);
+    exit;
+}
+
+if ($chat_id && $text === '🎉 جشنواره ثبت نام') {
+    require_once __DIR__ . '/menu_festival.php';
+    sendFestivalOffers($token, $chat_id);
+    exit;
+}
+
+if ($callback_data && strpos($callback_data, 'price_') === 0) {
+    require_once __DIR__ . '/menu_prices.php';
+    $duration = str_replace('price_', '', $callback_data);
+    sendPriceList($token, $callback_chat, $message_id, $duration);
+    exit;
+}
+
+if ($callback_data && $callback_data === 'change_duration') {
+    $keyboard = [
+        'inline_keyboard' => [
+            [
+                ['text' => '۱ ماهه', 'callback_data' => 'price_1ماهه'],
+                ['text' => '۳ ماهه', 'callback_data' => 'price_3ماه']
+            ],
+            [
+                ['text' => '۶ ماهه', 'callback_data' => 'price_6ماه'],
+                ['text' => '۱۲ ماهه', 'callback_data' => 'price_12ماه']
+            ]
+        ]
+    ];
+    editMessageTextWithKeyboard($token, $callback_chat, $message_id, "📅 مدت زمان سرویس را انتخاب کنید:", $keyboard);
+    exit;
+}
+
+if ($callback_data && $callback_data === 'main_menu') {
+    require_once __DIR__ . '/menu.php';
+    sendMainMenu($callback_chat, $token);
+    exit;
+}
+
+// --- سناریوی جشنواره چندمرحله‌ای ---
 if ($callback_data && strpos($callback_data, 'fest_offer_') === 0) {
+    // انتخاب سرویس جشنواره
     setUserState($callback_chat, 'ask_mobile', $callback_data);
 
     $keyboard = [
@@ -205,10 +261,10 @@ if ($callback_data && strpos($callback_data, 'fest_offer_') === 0) {
     exit;
 }
 
-// ۲) دریافت شماره موبایل
 if ($chat_id) {
     $state = getUserState($chat_id);
 
+    // مرحله دریافت موبایل
     if ($state && $state['step'] === 'ask_mobile') {
         $mobile = isset($update['message']['contact']['phone_number'])
             ? $update['message']['contact']['phone_number']
@@ -220,7 +276,7 @@ if ($chat_id) {
         exit;
     }
 
-    // ۳) دریافت تلفن ثابت
+    // مرحله دریافت تلفن ثابت
     if ($state && $state['step'] === 'ask_landline') {
         $landline = $text;
         setUserState($chat_id, 'done', $state['service'], $state['mobile'], $landline);
@@ -232,6 +288,17 @@ if ($chat_id) {
     }
 }
 
+// --- پیام پیش‌فرض ---
+if ($chat_id && $text !== '' && !in_array($text, ['/start','💰 لیست قیمتها','🎉 جشنواره ثبت نام'])) {
+    sendMessage($token, $chat_id, "برای شروع از منوی زیر استفاده کنید:", null);
+    exit;
+}
 
+// --- تنظیم وبهوک ---
+if (isset($_GET['setwebhook'])) {
+    $url = "https://adsl2bot-php.onrender.com/index.php";
+    file_get_contents("https://api.telegram.org/bot{$token}/setWebhook?" . http_build_query(['url' => $url]));
+    echo "Webhook set!";
+    exit;
+}
 ?>
-
