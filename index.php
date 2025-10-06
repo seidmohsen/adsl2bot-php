@@ -111,7 +111,7 @@ function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyb
 }*/
 
 
-require_once __DIR__ . '/vendor/autoload.php';
+
 use PDO;
 
 // --- اتصال به PostgreSQL ---
@@ -296,4 +296,5 @@ if (isset($_GET['setwebhook'])) {
     exit;
 }
 ?>
+
 
