@@ -1,4 +1,4 @@
-<?php 
+<?php /*
 $token = getenv("BOT_TOKEN");
 
 // دریافت آپدیت از تلگرام
@@ -108,5 +108,130 @@ function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyb
         $data['parse_mode'] = $parse_mode;
     }
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
+}*/
+
+
+<?php 
+require_once __DIR__ . '/vendor/autoload.php';
+
+use PDO;
+
+// اتصال به PostgreSQL
+function getDb() {
+    static $pdo;
+    if (!$pdo) {
+        $dsn = sprintf(
+            "pgsql:host=%s;port=%s;dbname=%s;user=%s;password=%s",
+            getenv('PGHOST'),
+            getenv('PGPORT'),
+            getenv('PGDATABASE'),
+            getenv('PGUSER'),
+            getenv('PGPASSWORD')
+        );
+        $pdo = new PDO($dsn);
+    }
+    return $pdo;
 }
+
+function setUserState($chat_id, $step, $service = null, $mobile = null, $landline = null) {
+    $pdo = getDb();
+    $stmt = $pdo->prepare("
+        INSERT INTO user_states (chat_id, step, service, mobile, landline)
+        VALUES (:chat_id, :step, :service, :mobile, :landline)
+        ON CONFLICT (chat_id) DO UPDATE
+        SET step = EXCLUDED.step,
+            service = EXCLUDED.service,
+            mobile = EXCLUDED.mobile,
+            landline = EXCLUDED.landline
+    ");
+    $stmt->execute([
+        ':chat_id' => $chat_id,
+        ':step'    => $step,
+        ':service' => $service,
+        ':mobile'  => $mobile,
+        ':landline'=> $landline
+    ]);
+}
+
+function getUserState($chat_id) {
+    $pdo = getDb();
+    $stmt = $pdo->prepare("SELECT * FROM user_states WHERE chat_id = :chat_id");
+    $stmt->execute([':chat_id' => $chat_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function clearUserState($chat_id) {
+    $pdo = getDb();
+    $stmt = $pdo->prepare("DELETE FROM user_states WHERE chat_id = :chat_id");
+    $stmt->execute([':chat_id' => $chat_id]);
+}
+
+// توابع ارسال پیام
+function sendMessage($token, $chat_id, $text, $keyboard = null, $parse_mode = null) {
+    $data = ['chat_id' => $chat_id, 'text' => $text];
+    if ($keyboard) $data['reply_markup'] = json_encode($keyboard, JSON_UNESCAPED_UNICODE);
+    if ($parse_mode) $data['parse_mode'] = $parse_mode;
+    file_get_contents("https://api.telegram.org/bot{$token}/sendMessage?" . http_build_query($data));
+}
+
+function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyboard, $parse_mode = null) {
+    $data = ['chat_id' => $chat_id, 'message_id' => $message_id, 'text' => $text];
+    if ($keyboard) $data['reply_markup'] = json_encode($keyboard, JSON_UNESCAPED_UNICODE);
+    if ($parse_mode) $data['parse_mode'] = $parse_mode;
+    file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
+}
+
+$token = getenv("BOT_TOKEN");
+$update = json_decode(file_get_contents("php://input"), true);
+
+$chat_id       = $update['message']['chat']['id'] ?? null;
+$text          = trim($update['message']['text'] ?? '');
+$callback_data = $update['callback_query']['data'] ?? null;
+$callback_chat = $update['callback_query']['message']['chat']['id'] ?? null;
+$message_id    = $update['callback_query']['message']['message_id'] ?? null;
+
+// ۱) انتخاب یکی از جشنواره‌ها
+if ($callback_data && strpos($callback_data, 'fest_offer_') === 0) {
+    setUserState($callback_chat, 'ask_mobile', $callback_data);
+
+    $keyboard = [
+        'keyboard' => [
+            [['text' => '📱 ارسال شماره موبایل', 'request_contact' => true]]
+        ],
+        'resize_keyboard' => true,
+        'one_time_keyboard' => true
+    ];
+    sendMessage($token, $callback_chat, "لطفاً شماره موبایل خود را ارسال کنید:", $keyboard);
+    exit;
+}
+
+// ۲) دریافت شماره موبایل
+if ($chat_id) {
+    $state = getUserState($chat_id);
+
+    if ($state && $state['step'] === 'ask_mobile') {
+        $mobile = isset($update['message']['contact']['phone_number'])
+            ? $update['message']['contact']['phone_number']
+            : $text;
+
+        setUserState($chat_id, 'ask_landline', $state['service'], $mobile);
+
+        sendMessage($token, $chat_id, "📞 لطفاً شماره تلفن ثابت خود را به همراه کد شهر ارسال کنید (مثال: 021-12345678):");
+        exit;
+    }
+
+    // ۳) دریافت تلفن ثابت
+    if ($state && $state['step'] === 'ask_landline') {
+        $landline = $text;
+        setUserState($chat_id, 'done', $state['service'], $state['mobile'], $landline);
+
+        sendMessage($token, $chat_id, "✅ با تشکر از حسن انتخاب شما\nپس از امکان‌سنجی ارائه خدمات آسیاتک، به زودی با شما تماس خواهیم گرفت.");
+
+        clearUserState($chat_id);
+        exit;
+    }
+}
+
+
+?>
 
