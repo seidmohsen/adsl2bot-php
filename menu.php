@@ -1,5 +1,5 @@
 <?php
-function sendMainMenu($chat_id, $token){
+/*function sendMainMenu($chat_id, $token){
     // هر دکمه به جای متن فارسی دستور ثابت رو ارسال می‌کنه
     $keyboard = [
         [['text' => '📝 ثبت نام', 'callback_data' => '/register']], // هنوز پیاده‌سازی نشده
@@ -28,7 +28,32 @@ function sendMainMenu($chat_id, $token){
     ]));
 }
 
+*/
 
+
+function sendMainMenu($chat_id, $token){
+    // منوی اصلی به صورت Reply Keyboard
+    // هر دکمه متن فارسی دارد ولی پشت‌صحنه همان دستور ثابت ارسال می‌شود
+    $keyboard = [
+        ['🎉 جشنواره ثبت نام', '💰 لیست قیمتها'], 
+        ['📝 ثبت نام', '🔄 تمدید سرویس'],
+        ['📞 تماس با ما']
+    ];
+
+    $response = [
+        'keyboard' => $keyboard,
+        'resize_keyboard' => true
+    ];
+
+    $text = "🌐 خوش آمدید!\n\n"
+          . "لطفاً یکی از گزینه‌ها را انتخاب کنید:";
+
+    file_get_contents("https://api.telegram.org/bot{$token}/sendMessage?" . http_build_query([
+        'chat_id' => $chat_id,
+        'text' => $text,
+        'reply_markup' => json_encode($response, JSON_UNESCAPED_UNICODE)
+    ]));
+}
 
 
 
