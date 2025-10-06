@@ -20,14 +20,14 @@ if ($chat_id && $text === '/start') {
 }
 
 // لیست قیمت‌ها
-if ($chat_id && $text === '/prices') {
+if ($chat_id && $text === '💰 لیست قیمتها') {
     require_once __DIR__ . '/menu_prices.php';
     showPriceDurations($token, $chat_id);
     exit;
 }
 
 // جشنواره ثبت نام
-if ($chat_id && $text === '/festival') {
+if ($chat_id && $text === '🎉 جشنواره ثبت نام') {
     require_once __DIR__ . '/menu_festival.php';
     sendFestivalOffers($token, $chat_id);
     exit;
@@ -67,7 +67,7 @@ if ($callback_data && $callback_data === 'main_menu') {
 }
 
 // پیام پیش‌فرض
-if ($chat_id && $text != '' && !in_array($text, ['/start','/prices','/festival'])) {
+if ($chat_id && $text != '' && !in_array($text, ['/start','💰 لیست قیمتها','🎉 جشنواره ثبت نام'])) {
     sendMessage($token, $chat_id, "برای شروع از منوی زیر استفاده کنید:", null);
     exit;
 }
@@ -109,3 +109,4 @@ function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyb
     }
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }
+
