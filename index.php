@@ -110,8 +110,7 @@ function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyb
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }*/
 
-
-
+<?php
 use PDO;
 
 // --- اتصال به PostgreSQL ---
@@ -145,10 +144,10 @@ function setUserState($chat_id, $step, $service = null, $mobile = null, $landlin
     ");
     $stmt->execute([
         ':chat_id' => $chat_id,
-        ':step'    => $step,
+        ':step' => $step,
         ':service' => $service,
-        ':mobile'  => $mobile,
-        ':landline'=> $landline
+        ':mobile' => $mobile,
+        ':landline' => $landline
     ]);
 }
 
@@ -219,14 +218,10 @@ if ($callback_data && strpos($callback_data, 'price_') === 0) {
 if ($callback_data && $callback_data === 'change_duration') {
     $keyboard = [
         'inline_keyboard' => [
-            [
-                ['text' => '۱ ماهه', 'callback_data' => 'price_1ماهه'],
-                ['text' => '۳ ماهه', 'callback_data' => 'price_3ماه']
-            ],
-            [
-                ['text' => '۶ ماهه', 'callback_data' => 'price_6ماه'],
-                ['text' => '۱۲ ماهه', 'callback_data' => 'price_12ماه']
-            ]
+            [['text' => '۱ ماهه', 'callback_data' => 'price_1ماهه'],
+             ['text' => '۳ ماهه', 'callback_data' => 'price_3ماه']],
+            [['text' => '۶ ماهه', 'callback_data' => 'price_6ماه'],
+             ['text' => '۱۲ ماهه', 'callback_data' => 'price_12ماه']]
         ]
     ];
     editMessageTextWithKeyboard($token, $callback_chat, $message_id, "📅 مدت زمان سرویس را انتخاب کنید:", $keyboard);
@@ -241,9 +236,7 @@ if ($callback_data && $callback_data === 'main_menu') {
 
 // --- سناریوی جشنواره چندمرحله‌ای ---
 if ($callback_data && strpos($callback_data, 'fest_offer_') === 0) {
-    // انتخاب سرویس جشنواره
     setUserState($callback_chat, 'ask_mobile', $callback_data);
-
     $keyboard = [
         'keyboard' => [
             [['text' => '📱 ارسال شماره موبایل', 'request_contact' => true]]
@@ -258,24 +251,34 @@ if ($callback_data && strpos($callback_data, 'fest_offer_') === 0) {
 if ($chat_id) {
     $state = getUserState($chat_id);
 
-    // مرحله دریافت موبایل
+    // دریافت موبایل
     if ($state && $state['step'] === 'ask_mobile') {
         $mobile = isset($update['message']['contact']['phone_number'])
             ? $update['message']['contact']['phone_number']
             : $text;
 
         setUserState($chat_id, 'ask_landline', $state['service'], $mobile);
-
         sendMessage($token, $chat_id, "📞 لطفاً شماره تلفن ثابت خود را به همراه کد شهر ارسال کنید (مثال: 021-12345678):");
         exit;
     }
 
-    // مرحله دریافت تلفن ثابت
+    // دریافت تلفن ثابت + اطلاع مدیر
     if ($state && $state['step'] === 'ask_landline') {
         $landline = $text;
         setUserState($chat_id, 'done', $state['service'], $state['mobile'], $landline);
 
         sendMessage($token, $chat_id, "✅ با تشکر از حسن انتخاب شما\nپس از امکان‌سنجی ارائه خدمات آسیاتک، به زودی با شما تماس خواهیم گرفت.");
+
+        // ارسال پیام به مدیر
+        $admin_chat_id = getenv('ADMIN_CHAT_ID'); // یا مستقیم آیدی عددی خودتون
+        $msg = "📢 ثبت‌نام جدید جشنواره:\n"
+             . "👤 Chat ID: {$chat_id}\n"
+             . "🎯 سرویس: {$state['service']}\n"
+             . "📱 موبایل: {$state['mobile']}\n"
+             . "☎ تلفن ثابت: {$landline}";
+        if ($admin_chat_id) {
+            sendMessage($token, $admin_chat_id, $msg);
+        }
 
         clearUserState($chat_id);
         exit;
@@ -290,11 +293,8 @@ if ($chat_id && $text !== '' && !in_array($text, ['/start','💰 لیست قیم
 
 // --- تنظیم وبهوک ---
 if (isset($_GET['setwebhook'])) {
-    $url = "https://adsl2bot-php.onrender.com/index.php";
+    $url = "https://your-service-name.onrender.com/index.php";
     file_get_contents("https://api.telegram.org/bot{$token}/setWebhook?" . http_build_query(['url' => $url]));
     echo "Webhook set!";
     exit;
 }
-?>
-
-
