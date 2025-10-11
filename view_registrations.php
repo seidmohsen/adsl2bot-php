@@ -25,6 +25,7 @@ if (!$registrations) {
 } else {
     echo "<table border='1' cellpadding='5' cellspacing='0'>";
     echo "<tr>
+            <th>id</th>
             <th>Chat ID</th>
             <th>سرویس</th>
             <th>موبایل</th>
@@ -33,6 +34,7 @@ if (!$registrations) {
           </tr>";
     foreach ($registrations as $row) {
         echo "<tr>
+                 <td>{$row['id']}</td>
                 <td>{$row['chat_id']}</td>
                 <td>{$row['service']}</td>
                 <td>{$row['mobile']}</td>
