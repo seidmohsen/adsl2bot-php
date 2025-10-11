@@ -14,12 +14,14 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     echo "✅ اتصال به دیتابیس برقرار شد.<br>";
-
+    $sql = "DROP TABLE IF EXISTS festival_registrations;"
+     $pdo->exec($sql);
+    
     // ایجاد جدول با قید UNIQUE روی chat_id
     $sql = "
         CREATE TABLE IF NOT EXISTS festival_registrations (
             id SERIAL PRIMARY KEY,
-            chat_id BIGINT NOT NULL UNIQUE,
+            chat_id BIGINT NOT NULL ,
             service TEXT,
             mobile TEXT,
             adsl TEXT,
