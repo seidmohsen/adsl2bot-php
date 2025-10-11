@@ -250,7 +250,7 @@ if ($chat_id) {
                                     sendMessage($token, $chat_id, "لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", $keyboard);
                                     exit;
                                 }
-                                /
+                                
                                 // اگر تکراری نبود → ادامه فرآیند ثبت‌نام
                                 setUserState($chat_id, 'done', $state['service'], $state['mobile'], $landline);
                         
@@ -305,6 +305,7 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
 
