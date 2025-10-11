@@ -10,7 +10,7 @@ function sendFestivalOffers($token, $chat_id) {
             'volume'   => '۲۴۰۰ گیگابایت بین الملل',
             'speed'    => '۸ مگابیت',
             'customer' => 'جدید',
-            'callback' => 'fest_offer_vezheh'
+            'callback' => 'fest_offer_12M2400G'
         ],
         [
             'title'    => 'پرحجم',
@@ -19,7 +19,7 @@ function sendFestivalOffers($token, $chat_id) {
             'volume'   => '۱200 گیگابایت بین الملل',
             'speed'    => '۸ مگابیت',
             'customer' => 'جدید',
-            'callback' => 'fest_offer_porhajm'
+            'callback' => 'fest_offer_6M1200G'
         ],
         [
             'title'    => 'اقتصادی',
@@ -28,7 +28,7 @@ function sendFestivalOffers($token, $chat_id) {
             'volume'   => '۲۴۰ گیگابایت بین الملل',
             'speed'    => '۸ مگابیت',
             'customer' => 'جدید',
-            'callback' => 'fest_offer_eghtesadi'
+            'callback' => 'fest_offer_3M240G'
         ]
     ];
 
