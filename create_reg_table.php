@@ -40,14 +40,9 @@ try {
     $landline_test = '02112345678';
 
     $insert_sql = "
-        INSERT INTO festival_registrations (chat_id, service, mobile, adsl, landline)
-        VALUES (:chat_id, :service, :mobile, :adsl, :landline)
-       
-            service = EXCLUDED.service,
-            mobile = EXCLUDED.mobile,
-            adsl = EXCLUDED.adsl,
-            landline = EXCLUDED.landline;
-    ";
+    INSERT INTO festival_registrations (chat_id, service, mobile, adsl, landline)
+    VALUES (:chat_id, :service, :mobile, :adsl, :landline);
+";
 
     $stmt = $pdo->prepare($insert_sql);
     $stmt->execute([
