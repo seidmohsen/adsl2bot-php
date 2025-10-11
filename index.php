@@ -212,8 +212,9 @@ if ($chat_id && $text !== '' && !in_array($text, ['/start', '💰 لیست قی�
 // ⚙️ تنظیم وبهوک دستی
 // ============================
 if (isset($_GET['setwebhook'])) {
-    $url = "https://your-service-name.onrender.com/index.php"; // آدرس واقعی سرویس Render
+    $url = "https://adsl2bot-php.onrender.com/index.php"; // آدرس واقعی سرویس Render
     file_get_contents("https://api.telegram.org/bot{$token}/setWebhook?" . http_build_query(['url' => $url]));
     echo "Webhook set!";
     exit;
 }
+
