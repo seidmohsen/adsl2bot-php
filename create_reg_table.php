@@ -42,7 +42,7 @@ try {
     $insert_sql = "
         INSERT INTO festival_registrations (chat_id, service, mobile, adsl, landline)
         VALUES (:chat_id, :service, :mobile, :adsl, :landline)
-        ON CONFLICT (chat_id) DO UPDATE SET
+       
             service = EXCLUDED.service,
             mobile = EXCLUDED.mobile,
             adsl = EXCLUDED.adsl,
