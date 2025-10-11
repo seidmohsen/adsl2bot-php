@@ -60,6 +60,18 @@ function sendMessage($token, $chat_id, $text, $keyboard = null, $parse_mode = nu
     if ($parse_mode) $data['parse_mode'] = $parse_mode;
     file_get_contents("https://api.telegram.org/bot{$token}/sendMessage?" . http_build_query($data));
 }
+function sendMainMenu($chat_id) {
+    $keyboard = [
+        'keyboard' => [
+            [['text' => '🎉 جشنواره ثبت‌نام']],
+            [['text' => '💬 پشتیبانی']],
+            [['text' => 'ℹ️ درباره ما']]
+        ],
+        'resize_keyboard' => true,
+        'one_time_keyboard' => false
+    ];
+    sendMessage($chat_id, "منوی اصلی:", $keyboard);
+}
 
 function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyboard, $parse_mode = null) {
     $data = ['chat_id' => $chat_id, 'message_id' => $message_id, 'text' => $text];
@@ -157,6 +169,8 @@ if ($chat_id) {
         setUserState($chat_id, 'done', $state['service'], $state['mobile'], $landline);
 
         sendMessage($token, $chat_id, "✅ با تشکر از حسن انتخاب شما\nپس از امکان‌سنجی ارائه خدمات آسیاتک، به زودی با شما تماس خواهیم گرفت.");
+        clearUserState($chat_id);
+        sendMainMenu($chat_id);
 
         // ارسال پیام به مدیر
         $admin_chat_id = getenv('ADMIN_CHAT_ID'); // یا مستقیم آیدی عددی خودتون
@@ -187,5 +201,6 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
