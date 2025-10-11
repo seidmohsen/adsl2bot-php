@@ -81,6 +81,7 @@ $callback_data = $update['callback_query']['data'] ?? null;
 $callback_chat = $update['callback_query']['message']['chat']['id'] ?? null;
 $message_id    = $update['callback_query']['message']['message_id'] ?? null;
 
+require_once __DIR__ . '/menu.php';
 // ============================
 // 🟢 شروع مسیرهای اصلی منو
 // ============================
@@ -88,7 +89,6 @@ $message_id    = $update['callback_query']['message']['message_id'] ?? null;
 // دستور /start
 if ($chat_id && str_starts_with(strtolower($text), '/start')) {
     clearUserState($chat_id);
-    require_once __DIR__ . '/menu.php';
     sendMainMenu($token, $chat_id);
     exit;
 }
@@ -207,6 +207,7 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
 
