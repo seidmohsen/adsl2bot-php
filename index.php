@@ -166,85 +166,85 @@ if ($callback_data && str_starts_with($callback_data, 'fest_offer_')) {
 }
 
 if ($chat_id) {
-    $state = getUserState($chat_id);
-
-    // مرحله ۲: دریافت موبایل
-    if ($state && $state['step'] === 'ask_mobile') {
-        $mobile = $update['message']['contact']['phone_number'] ?? $text;
-        setUserState($chat_id, 'ask_landline', $state['service'], $mobile);
-        sendMessage($token, $chat_id, "📞 لطفاً شماره تلفن ثابت خود را با کد شهر وارد کنید (مثال: 021-12345678):");
-        exit;
-    }
-
-    // مرحله ۳: دریافت تلفن ثابت و اتمام فرایند
-    if ($state && $state['step'] === 'ask_landline') {
-    $landline = trim($text);
-    $pdo = getDb();
-
-    // بررسی تکراری بودن شماره تلفن ثابت
-    if (isLandlineDuplicate($pdo, $landline)) {
-        sendMessage($token, $chat_id, "⚠️ شماره $landline قبلاً در جشنواره ثبت شده است.\nلطفاً یک شماره دیگر وارد کنید یا گزینه مورد نظر را انتخاب کنید 👇");
-        
-        // نمایش منوی انتخاب برای ادامه یا خروج از جشنواره
-        $keyboard = [
-            ['📞 وارد کردن شماره جدید'],
-            ['🚪 خروج از ثبت‌نام جشنواره']
-        ];
-        sendMessage($token, $chat_id, "لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", [
-            'reply_markup' => json_encode(['keyboard' => $keyboard, 'resize_keyboard' => true])
-        ]);
-
-        exit;
-    }
-
-    // اگر تکراری نبود → ادامه فرآیند ثبت‌نام
-    setUserState($chat_id, 'done', $state['service'], $state['mobile'], $landline);
-
-    sendMessage($token, $chat_id, "✅ با تشکر از حسن انتخاب شما\nپس از امکان‌سنجی ارائه خدمات آسیاتک، به زودی با شما تماس خواهیم گرفت.");
-
-    // اطلاع‌رسانی به مدیر
-    $admin_chat_id = getenv('ADMIN_CHAT_ID');
-    if ($admin_chat_id) {
-        $msg = "📢 ثبت‌نام جدید جشنواره:\n"
-             . "👤 Chat ID: {$chat_id}\n"
-             . "🎯 سرویس: {$state['service']}\n"
-             . "📱 موبایل: {$state['mobile']}\n"
-             . "☎ تلفن ثابت: {$landline}";
-        sendMessage($token, $admin_chat_id, $msg);
-    }
-
-    // ذخیره در دیتابیس
-    $stmt = $pdo->prepare("
-        INSERT INTO festival_registrations (chat_id, service, mobile, adsl, landline)
-        VALUES (:chat_id, :service, :mobile, :adsl, :landline)
-    ");
-    $stmt->execute([
-        ':chat_id'  => $chat_id,
-        ':service'  => $state['service'],
-        ':mobile'   => $state['mobile'],
-        ':adsl'     => $landline,
-        ':landline' => $landline
-    ]);
-
-    clearUserState($chat_id);
-    sendMainMenu($token, $chat_id);
-    exit;
-}
-
-
-// اگر کاربر خواست شماره جدید وارد کند
-if ($text === '📞 وارد کردن شماره جدید') {
-    setUserState($chat_id, 'ask_landline', $state['service'], $state['mobile'], null);
-    sendMessage($token, $chat_id, "☎ لطفاً شماره تلفن ثابت خود را وارد کنید:");
-    exit;
-}
-
-// اگر خواست از ثبت‌نام خارج شود
-if ($text === '🚪 خروج از ثبت‌نام جشنواره') {
-    clearUserState($chat_id);
-    sendMainMenu($token, $chat_id);
-    exit;
-}
+                    $state = getUserState($chat_id);
+                
+                    // مرحله ۲: دریافت موبایل
+                    if ($state && $state['step'] === 'ask_mobile') {
+                        $mobile = $update['message']['contact']['phone_number'] ?? $text;
+                        setUserState($chat_id, 'ask_landline', $state['service'], $mobile);
+                        sendMessage($token, $chat_id, "📞 لطفاً شماره تلفن ثابت خود را با کد شهر وارد کنید (مثال: 021-12345678):");
+                        exit;
+                    }
+                
+                    // مرحله ۳: دریافت تلفن ثابت و اتمام فرایند
+                    if ($state && $state['step'] === 'ask_landline') {
+                    $landline = trim($text);
+                    $pdo = getDb();
+                
+                    // بررسی تکراری بودن شماره تلفن ثابت
+                    if (isLandlineDuplicate($pdo, $landline)) {
+                        sendMessage($token, $chat_id, "⚠️ شماره $landline قبلاً در جشنواره ثبت شده است.\nلطفاً یک شماره دیگر وارد کنید یا گزینه مورد نظر را انتخاب کنید 👇");
+                        
+                        // نمایش منوی انتخاب برای ادامه یا خروج از جشنواره
+                        $keyboard = [
+                            ['📞 وارد کردن شماره جدید'],
+                            ['🚪 خروج از ثبت‌نام جشنواره']
+                        ];
+                        sendMessage($token, $chat_id, "لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", [
+                            'reply_markup' => json_encode(['keyboard' => $keyboard, 'resize_keyboard' => true])
+                        ]);
+                
+                        exit;
+                    }
+                
+                    // اگر تکراری نبود → ادامه فرآیند ثبت‌نام
+                    setUserState($chat_id, 'done', $state['service'], $state['mobile'], $landline);
+                
+                    sendMessage($token, $chat_id, "✅ با تشکر از حسن انتخاب شما\nپس از امکان‌سنجی ارائه خدمات آسیاتک، به زودی با شما تماس خواهیم گرفت.");
+                
+                    // اطلاع‌رسانی به مدیر
+                    $admin_chat_id = getenv('ADMIN_CHAT_ID');
+                    if ($admin_chat_id) {
+                        $msg = "📢 ثبت‌نام جدید جشنواره:\n"
+                             . "👤 Chat ID: {$chat_id}\n"
+                             . "🎯 سرویس: {$state['service']}\n"
+                             . "📱 موبایل: {$state['mobile']}\n"
+                             . "☎ تلفن ثابت: {$landline}";
+                        sendMessage($token, $admin_chat_id, $msg);
+                    }
+                
+                    // ذخیره در دیتابیس
+                    $stmt = $pdo->prepare("
+                        INSERT INTO festival_registrations (chat_id, service, mobile, adsl, landline)
+                        VALUES (:chat_id, :service, :mobile, :adsl, :landline)
+                    ");
+                    $stmt->execute([
+                        ':chat_id'  => $chat_id,
+                        ':service'  => $state['service'],
+                        ':mobile'   => $state['mobile'],
+                        ':adsl'     => $landline,
+                        ':landline' => $landline
+                    ]);
+                
+                    clearUserState($chat_id);
+                    sendMainMenu($token, $chat_id);
+                    exit;
+                }
+                
+                
+                // اگر کاربر خواست شماره جدید وارد کند
+                if ($text === '📞 وارد کردن شماره جدید') {
+                    setUserState($chat_id, 'ask_landline', $state['service'], $state['mobile'], null);
+                    sendMessage($token, $chat_id, "☎ لطفاً شماره تلفن ثابت خود را وارد کنید:");
+                    exit;
+                }
+                
+                // اگر خواست از ثبت‌نام خارج شود
+                if ($text === '🚪 خروج از ثبت‌نام جشنواره') {
+                    clearUserState($chat_id);
+                    sendMainMenu($token, $chat_id);
+                    exit;
+                }
 
 }
 
@@ -268,4 +268,5 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
