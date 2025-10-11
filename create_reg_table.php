@@ -20,7 +20,7 @@ try {
     // ایجاد جدول با قید UNIQUE روی chat_id
     $sql = "
         CREATE TABLE IF NOT EXISTS festival_registrations (
-            id SERIAL PRIMARY KEY,
+            id SERIAL PRIMARY KEY UNIQUE,
             chat_id BIGINT NOT NULL ,
             service TEXT,
             mobile TEXT,
