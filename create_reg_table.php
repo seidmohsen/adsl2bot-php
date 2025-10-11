@@ -64,7 +64,7 @@ try {
     echo "📋 رکوردهای موجود در جدول:<br>";
     $stmt = $pdo->query("SELECT * FROM festival_registrations");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo "- chat_id: {$row['chat_id']},  service: {$row['service']}, mobile: {$row['mobile']}, adsl: {$row['adsl']], landline: {$row['landline']}<br>";
+        echo "- chat_id: {$row['chat_id']},  service: {$row['service']}, mobile: {$row['mobile']}, adsl: {$row['adsl']}, landline: {$row['landline']}<br>";
     }
 
 } catch (PDOException $e) {
