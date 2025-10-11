@@ -31,7 +31,7 @@
 */
 
 
-function sendMainMenu($chat_id, $token){
+function sendMainMenu($token, $chat_id){
     // منوی اصلی به صورت Reply Keyboard
     // هر دکمه متن فارسی دارد ولی پشت‌صحنه همان دستور ثابت ارسال می‌شود
     $keyboard = [
