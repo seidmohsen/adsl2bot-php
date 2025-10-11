@@ -1,5 +1,5 @@
 <?php
-echo "123";
+//echo "123";
 try {
     $dsn = sprintf(
         "pgsql:host=%s;port=%s;dbname=%s;user=%s;password=%s",
