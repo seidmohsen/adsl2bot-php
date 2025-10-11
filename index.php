@@ -167,7 +167,24 @@ if ($callback_data && str_starts_with($callback_data, 'fest_offer_')) {
 
 if ($chat_id) {
                     $state = getUserState($chat_id);
+
+
+                                    // اگر کاربر خواست شماره جدید وارد کند
+                if ($text === '📞 وارد کردن شماره جدید') {
+                    setUserState($chat_id, 'ask_landline', $state['service'], $state['mobile'], null);
+                    sendMessage($token, $chat_id, "☎ لطفاً شماره تلفن ثابت خود را وارد کنید:");
+                    exit;
+                }
                 
+                // اگر خواست از ثبت‌نام خارج شود
+                if ($text === '🚪 خروج از ثبت‌نام جشنواره') {
+                    clearUserState($chat_id);
+                    sendMainMenu($token, $chat_id);
+                    exit;
+                }
+
+
+    
                     // مرحله ۲: دریافت موبایل
                     if ($state && $state['step'] === 'ask_mobile') {
                         $mobile = $update['message']['contact']['phone_number'] ?? $text;
@@ -186,12 +203,17 @@ if ($chat_id) {
                         sendMessage($token, $chat_id, "⚠️ شماره $landline قبلاً در جشنواره ثبت شده است.\nلطفاً یک شماره دیگر وارد کنید یا گزینه مورد نظر را انتخاب کنید 👇");
                         
                         // نمایش منوی انتخاب برای ادامه یا خروج از جشنواره
-                        $keyboard = [
-                            ['📞 وارد کردن شماره جدید'],
-                            ['🚪 خروج از ثبت‌نام جشنواره']
-                        ];
+                       $keyboard = [
+                                'keyboard' => [
+                                [['text' => '📞 وارد کردن شماره جدید']],
+                                [['text' => '🚪 خروج از ثبت‌نام جشنواره']]
+                                ],
+                                'resize_keyboard' => true
+                                ];
+
                         sendMessage($token, $chat_id, "لطفاً یکی از گزینه‌های زیر را انتخاب کنید:", [
-                            'reply_markup' => json_encode(['keyboard' => $keyboard, 'resize_keyboard' => true])
+                        'keyboard' => $keyboard,
+                        'resize_keyboard' => true
                         ]);
                 
                         exit;
@@ -232,19 +254,6 @@ if ($chat_id) {
                 }
                 
                 
-                // اگر کاربر خواست شماره جدید وارد کند
-                if ($text === '📞 وارد کردن شماره جدید') {
-                    setUserState($chat_id, 'ask_landline', $state['service'], $state['mobile'], null);
-                    sendMessage($token, $chat_id, "☎ لطفاً شماره تلفن ثابت خود را وارد کنید:");
-                    exit;
-                }
-                
-                // اگر خواست از ثبت‌نام خارج شود
-                if ($text === '🚪 خروج از ثبت‌نام جشنواره') {
-                    clearUserState($chat_id);
-                    sendMainMenu($token, $chat_id);
-                    exit;
-                }
 
 }
 
@@ -268,5 +277,6 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
