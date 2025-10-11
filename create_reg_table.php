@@ -14,7 +14,7 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     echo "✅ اتصال به دیتابیس برقرار شد.<br>";
-    $sql = "DROP TABLE IF EXISTS festival_registrations;"
+    $sql = "DROP TABLE IF EXISTS festival_registrations;";
      $pdo->exec($sql);
     
     // ایجاد جدول با قید UNIQUE روی chat_id
