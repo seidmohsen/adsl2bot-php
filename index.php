@@ -70,7 +70,19 @@ function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyb
     if ($parse_mode) $data['parse_mode']   = $parse_mode;
     file_get_contents("https://api.telegram.org/bot{$token}/editMessageText?" . http_build_query($data));
 }
+//چک کردن شماره تکراری در جدول ثبت نام جشنواره
 
+function isLandlineDuplicate(PDO $pdo, string $landline): bool {
+    $sql = "SELECT COUNT(*) FROM festival_registrations WHERE landline = :landline";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':landline' => $landline]);
+    $count = $stmt->fetchColumn();
+
+    return $count > 0; // اگر حداقل یک رکورد پیدا شد، یعنی تکراری است
+}
+
+
+///
 // --- اطلاعات آپدیت ---
 $token = getenv("BOT_TOKEN");
 $update = json_decode(file_get_contents("php://input"), true);
@@ -223,6 +235,7 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
 
