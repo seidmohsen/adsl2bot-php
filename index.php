@@ -183,6 +183,26 @@ if ($chat_id) {
             sendMessage($token, $admin_chat_id, $msg);
         }
 
+            // --- ذخیره سوابق ثبت‌نام ---
+            $pdo = getDb();
+            $stmt = $pdo->prepare("
+                INSERT INTO festival_registrations (chat_id, service, mobile, adsl, landline)
+                VALUES (:chat_id, :service, :mobile, :adsl, :landline)
+            ");
+            $stmt->execute([
+                ':chat_id'  => $chat_id,
+                ':service'  => $state['service'],
+                ':mobile'   => $state['mobile'],
+                ':adsl'     => $landline,
+                ':landline' => $landline
+            ]);
+
+
+
+
+
+        
+
         clearUserState($chat_id);
         sendMainMenu($token, $chat_id);
         exit;
@@ -207,6 +227,7 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
 
