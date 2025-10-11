@@ -1,4 +1,5 @@
 <?php
+echo "123";
 try {
     // اتصال با استفاده از متغیرهای محیطی Render
     $dsn = sprintf(
