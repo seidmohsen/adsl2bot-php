@@ -1,7 +1,6 @@
 <?php
 echo "123";
 try {
-    // اتصال با استفاده از متغیرهای محیطی Render
     $dsn = sprintf(
         "pgsql:host=%s;port=%s;dbname=%s;user=%s;password=%s",
         getenv('PGHOST'),
@@ -16,27 +15,26 @@ try {
 
     echo "✅ اتصال به دیتابیس برقرار شد.<br>";
 
-    // ایجاد جدول اگر وجود ندارد
+    // ایجاد جدول با قید UNIQUE روی chat_id
     $sql = "
         CREATE TABLE IF NOT EXISTS festival_registrations (
-        id SERIAL PRIMARY KEY,
-        chat_id BIGINT NOT NULL,
-        service TEXT,
-        mobile TEXT,
-        adsl TEXT,
-        landline TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-
+            id SERIAL PRIMARY KEY,
+            chat_id BIGINT NOT NULL UNIQUE,
+            service TEXT,
+            mobile TEXT,
+            adsl TEXT,
+            landline TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
     ";
     $pdo->exec($sql);
-    echo "✅ جدول user_states ساخته شد یا از قبل وجود داشت.<br>";
+    echo "✅ جدول festival_registrations ساخته شد یا از قبل وجود داشت.<br>";
 
     // درج رکورد تستی
     $chat_id_test = 123456789;
     $service_test = 'festival';
     $mobile_test  = '09121234567';
-    $adsl_test = '02537732240';
+    $adsl_test    = '02537732240';
     $landline_test = '02112345678';
 
     $insert_sql = "
@@ -51,11 +49,11 @@ try {
 
     $stmt = $pdo->prepare($insert_sql);
     $stmt->execute([
-        ':chat_id' => $chat_id_test,
-        ':service' => $service_test,
-        ':mobile'  => $mobile_test,
-        ':adsl' => $adsl_test,
-        ':landline'=> $landline_test
+        ':chat_id'  => $chat_id_test,
+        ':service'  => $service_test,
+        ':mobile'   => $mobile_test,
+        ':adsl'     => $adsl_test,
+        ':landline' => $landline_test
     ]);
 
     echo "✅ رکورد تستی درج/به‌روزرسانی شد.<br>";
