@@ -54,7 +54,7 @@ try {
         ':chat_id' => $chat_id_test,
         ':service' => $service_test,
         ':mobile'  => $mobile_test,
-        'adsl' => $adsl_test,
+        ':adsl' => $adsl_test,
         ':landline'=> $landline_test
     ]);
 
