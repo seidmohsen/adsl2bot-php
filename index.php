@@ -199,11 +199,6 @@ if ($chat_id) {
             ]);
 
 
-
-
-
-        
-
         clearUserState($chat_id);
         sendMainMenu($token, $chat_id);
         exit;
@@ -228,6 +223,7 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
 
