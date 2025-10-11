@@ -1,5 +1,14 @@
 <?php
 
+function getMainMenuItems() {
+    return [
+        '🎉 جشنواره ثبت نام' => 'festival',
+        '💰 لیست قیمتها'   => 'prices',
+        '📝 ثبت نام'       => 'register',
+        '🔄 تمدید سرویس'   => 'renew',
+        '📞 تماس با ما'     => 'contact'
+    ];
+}
 
 function sendMainMenu($token, $chat_id){
     // منوی اصلی به صورت Reply Keyboard
