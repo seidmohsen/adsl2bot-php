@@ -62,18 +62,7 @@ function sendMessage($token, $chat_id, $text, $keyboard = null, $parse_mode = nu
     file_get_contents("https://api.telegram.org/bot{$token}/sendMessage?" . http_build_query($data));
 }
 
-function sendMainMenu($token, $chat_id) {
-    $keyboard = [
-        'keyboard' => [
-            [['text' => '🎉 جشنواره ثبت‌نام']],
-            [['text' => '💬 پشتیبانی']],
-            [['text' => 'ℹ️ درباره ما']]
-        ],
-        'resize_keyboard' => true,
-        'one_time_keyboard' => false
-    ];
-    sendMessage($token, $chat_id, "منوی اصلی:", $keyboard);
-}
+
 
 function editMessageTextWithKeyboard($token, $chat_id, $message_id, $text, $keyboard, $parse_mode = null) {
     $data = ['chat_id' => $chat_id, 'message_id' => $message_id, 'text' => $text];
@@ -99,6 +88,7 @@ $message_id    = $update['callback_query']['message']['message_id'] ?? null;
 // دستور /start
 if ($chat_id && str_starts_with(strtolower($text), '/start')) {
     clearUserState($chat_id);
+    require_once __DIR__ . '/menu.php';
     sendMainMenu($token, $chat_id);
     exit;
 }
@@ -217,4 +207,5 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
