@@ -101,7 +101,7 @@ if ($chat_id && $text === '💰 لیست قیمتها') {
 }
 
 // جشنواره
-if ($chat_id && $text === '🎉 جشنواره ثبت‌نام') {
+if ($chat_id && $text === '🎉 جشنواره ثبت نام') {
     require_once __DIR__ . '/menu_festival.php';
     sendFestivalOffers($token, $chat_id);
     exit;
@@ -207,5 +207,6 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
