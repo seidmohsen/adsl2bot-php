@@ -82,6 +82,7 @@ $callback_chat = $update['callback_query']['message']['chat']['id'] ?? null;
 $message_id    = $update['callback_query']['message']['message_id'] ?? null;
 
 require_once __DIR__ . '/menu.php';
+$menu_items = getMainMenuItems();
 // ============================
 // 🟢 شروع مسیرهای اصلی منو
 // ============================
@@ -212,7 +213,7 @@ if ($chat_id) {
 // ============================
 // 🔴 پیام پیش‌فرض
 // ============================
-if ($chat_id && $text !== '' && !in_array($text, ['/start', '💰 لیست قیمتها', '🎉 جشنواره ثبت‌نام'])) {
+if ($chat_id && $text !== '' ) {
     sendMessage($token, $chat_id, "برای شروع از منوی زیر استفاده کنید:");
     sendMainMenu($token, $chat_id);
     exit;
@@ -227,6 +228,7 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
 
