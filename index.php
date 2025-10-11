@@ -170,8 +170,7 @@ if ($chat_id) {
         setUserState($chat_id, 'done', $state['service'], $state['mobile'], $landline);
 
         sendMessage($token, $chat_id, "✅ با تشکر از حسن انتخاب شما\nپس از امکان‌سنجی ارائه خدمات آسیاتک، به زودی با شما تماس خواهیم گرفت.");
-        clearUserState($chat_id);
-        sendMainMenu($token, $chat_id);
+       
 
         // ارسال پیام به مدیر
         $admin_chat_id = getenv('ADMIN_CHAT_ID'); // یا مستقیم آیدی عددی خودتون
@@ -185,6 +184,7 @@ if ($chat_id) {
         }
 
         clearUserState($chat_id);
+        sendMainMenu($token, $chat_id);
         exit;
     }
 }
@@ -202,6 +202,7 @@ if (isset($_GET['setwebhook'])) {
     echo "Webhook set!";
     exit;
 }
+
 
 
 
