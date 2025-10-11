@@ -15,7 +15,7 @@ $pdo = new PDO($dsn);
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // گرفتن مخاطبین ثبت‌نام شده
-$stmt = $pdo->query("SELECT * FROM user_states ORDER BY chat_id ASC");
+$stmt = $pdo->query("SELECT * FROM festival_registrations ORDER BY chat_id ASC");
 $registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // نمایش HTML
@@ -26,17 +26,17 @@ if (!$registrations) {
     echo "<table border='1' cellpadding='5' cellspacing='0'>";
     echo "<tr>
             <th>Chat ID</th>
-            <th>مرحله</th>
             <th>سرویس</th>
             <th>موبایل</th>
+            <th>adsl</th>
             <th>تلفن ثابت</th>
           </tr>";
     foreach ($registrations as $row) {
         echo "<tr>
                 <td>{$row['chat_id']}</td>
-                <td>{$row['step']}</td>
                 <td>{$row['service']}</td>
                 <td>{$row['mobile']}</td>
+                <td>{$row['adsl']}</td>
                 <td>{$row['landline']}</td>
               </tr>";
     }
